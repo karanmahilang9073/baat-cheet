@@ -53,12 +53,12 @@ const Register = () => {
     }
 
   return (
-    <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 via-blue-600 to-purple-700 p-4'>
+    <div className='min-h-screen flex items-center justify-center bg-linear-to-br from-blue-500 via-blue-600 to-purple-700 p-4'>
       <div className='w-full max-w-sm'>
         {/* Card */}
         <div className='bg-white rounded-2xl shadow-2xl overflow-hidden'>
           {/* Header */}
-          <div className='bg-gradient-to-r from-blue-600 to-purple-600 px-6 pt-6 pb-4'>
+          <div className='bg-lineaar-to-r from-blue-600 to-purple-600 px-6 pt-6 pb-4'>
             <div className='text-center'>
               <div className='text-4xl mb-2'>💬</div>
               <h1 className='text-3xl font-bold text-white mb-1'>Batcheet</h1>
@@ -167,7 +167,7 @@ const Register = () => {
               <button 
                 type='submit' 
                 disabled={loading} 
-                className='w-full py-2 px-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-bold text-sm hover:from-blue-700 hover:to-purple-700 transition transform hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 mt-4'
+                className='w-full py-2 px-3 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-lg font-bold text-sm hover:from-blue-700 hover:to-purple-700 transition transform hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 mt-4'
               >
                 {loading ? (
                   <span className='flex items-center justify-center'>
