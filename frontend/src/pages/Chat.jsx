@@ -13,11 +13,11 @@ const Chat = () => {
     const navigate = useNavigate()
 
     const {conversations, currentConversation,getUserConversations,loading,error, selectConversation, messages, sendMessage } = useChat()
-    const {user, logout} = useAuth()
+    const {user, logout, loading: authLoading} = useAuth()
 
     useEffect(()=>{
-        if(user) getUserConversations()
-    },[user])
+        if(user && !authLoading) getUserConversations()
+    },[user, authLoading])
 
     useEffect(() => {
         scrollRef.current?.scrollIntoView({behaviour : "smooth"})

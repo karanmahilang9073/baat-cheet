@@ -8,7 +8,7 @@ import api from "../utils/api";
 const ChatContext = createContext()
 
 export const ChatProvider = ({children}) =>{
-    const { user } = useAuth()
+    const { user, loading: authLoading } = useAuth()
 
     //states
     const [conversations, setConversations] = useState([])
@@ -73,10 +73,10 @@ export const ChatProvider = ({children}) =>{
     }
 
     useEffect(()=>{
-        if(user) {
+        if(user && !authLoading) {
             getUserConversations()
         }
-    },[user])
+    },[user, authLoading])
 
     const createConversation = async({name, members, isGroup}) =>{
         setLoading(true)
