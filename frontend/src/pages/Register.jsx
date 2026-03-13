@@ -2,13 +2,6 @@ import  { useState } from 'react'
 import { useAuth } from '../context/authContext'
 import { useNavigate, Link } from 'react-router-dom'
 
-const AVATARS = [
-  'https://api.dicebear.com/7.x/bottts/svg?seed=One',
-  'https://api.dicebear.com/7.x/bottts/svg?seed=Two',
-  'https://api.dicebear.com/7.x/bottts/svg?seed=Three',
-  'https://api.dicebear.com/7.x/bottts/svg?seed=Four',
-]
-
 const Register = () => {
     const {register, loading, error} = useAuth()
     const navigate = useNavigate()
@@ -16,12 +9,40 @@ const Register = () => {
     const [username, setUsername] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const [avatar, setAvatar] = useState(AVATARS[0])
+    const [avatar, setAvatar] = useState(null)
+    const [avatarPreview, setAvatarPreview] = useState(null)
     const [touched, setTouched] = useState({})
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0]
+        if (file) {
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please select an image file')
+                return
+            }
+            // Validate file size (max 2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                alert('Image size must be less than 2MB')
+                return
+            }
+
+            const reader = new FileReader()
+            reader.onloadend = () => {
+                setAvatar(reader.result) // Base64 encoded image
+                setAvatarPreview(reader.result)
+            }
+            reader.readAsDataURL(file)
+        }
+    }
 
     const handleSubmit = async(e) => {
         e.preventDefault()
-        const success = await register(username,  email, password, avatar)
+        if (!avatar) {
+            alert('Please select a profile image')
+            return
+        }
+        const success = await register(username, email, password, avatar)
         if(success){
             navigate('/chat')
         }
@@ -31,106 +52,113 @@ const Register = () => {
         setTouched({...touched, [field]: true})
     }
 
-    const getFieldError = (field) => {
-        return touched[field] && !eval(field) ? true : false
-    }
-
   return (
     <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 via-blue-600 to-purple-700 p-4'>
-      <div className='w-full max-w-lg'>
+      <div className='w-full max-w-sm'>
         {/* Card */}
-        <div className='bg-white rounded-3xl shadow-2xl overflow-hidden'>
+        <div className='bg-white rounded-2xl shadow-2xl overflow-hidden'>
           {/* Header */}
-          <div className='bg-gradient-to-r from-blue-600 to-purple-600 px-8 pt-8 pb-6'>
+          <div className='bg-gradient-to-r from-blue-600 to-purple-600 px-6 pt-6 pb-4'>
             <div className='text-center'>
-              <div className='text-5xl mb-3'>💬</div>
-              <h1 className='text-4xl font-bold text-white mb-2'>Batcheet</h1>
-              <p className='text-blue-100'>Join the community and start chatting</p>
+              <div className='text-4xl mb-2'>💬</div>
+              <h1 className='text-3xl font-bold text-white mb-1'>Batcheet</h1>
+              <p className='text-blue-100 text-sm'>Create your account</p>
             </div>
           </div>
 
           {/* Form */}
-          <div className='px-8 py-8'>
-            <form onSubmit={handleSubmit} className='space-y-6'>
+          <div className='px-6 py-6'>
+            <form onSubmit={handleSubmit} className='space-y-4'>
               {/* Username */}
               <div>
-                <label className='block text-sm font-bold text-gray-800 mb-3'>👤 Username</label>
+                <label className='block text-xs font-bold text-gray-800 mb-1.5'>👤 Username</label>
                 <input 
                   type="text" 
                   value={username} 
                   onChange={(e)=>setUsername(e.target.value)}
                   onBlur={() => handleBlur('username')}
                   required
-                  className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition bg-gray-50' 
-                  placeholder='Pick a unique username' 
+                  className='w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition bg-gray-50 text-sm' 
+                  placeholder='Username' 
                 />
               </div>
 
               {/* Email */}
               <div>
-                <label className='block text-sm font-bold text-gray-800 mb-3'>📧 Email Address</label>
+                <label className='block text-xs font-bold text-gray-800 mb-1.5'>📧 Email Address</label>
                 <input 
                   type="email" 
                   value={email} 
                   onChange={(e)=>setEmail(e.target.value)}
                   onBlur={() => handleBlur('email')}
                   required
-                  className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition bg-gray-50' 
-                  placeholder='your@email.com' 
+                  className='w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition bg-gray-50 text-sm' 
+                  placeholder='email@example.com' 
                 />
               </div>
 
               {/* Password */}
               <div>
-                <label className='block text-sm font-bold text-gray-800 mb-3'>🔐 Password</label>
+                <label className='block text-xs font-bold text-gray-800 mb-1.5'>🔐 Password</label>
                 <input
                   type='password'
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   onBlur={() => handleBlur('password')}
                   required
-                  className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition bg-gray-50'
-                  placeholder='At least 6 characters'
+                  className='w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition bg-gray-50 text-sm'
+                  placeholder='Password'
                 />
               </div>
 
-              {/* Avatar Selection */}
+              {/* Profile Image Upload */}
               <div>
-                <label className='block text-sm font-bold text-gray-800 mb-4'>🎨 Choose Your Avatar</label>
-                <div className="grid grid-cols-4 gap-4 mb-5">
-                  {AVATARS.map((url, index) => (
-                    <button
-                      key={index}
-                      type='button'
-                      onClick={() => setAvatar(url)}
-                      className={`relative p-2 rounded-2xl border-3 transition transform hover:scale-110 ${
-                        avatar === url 
-                          ? 'border-blue-600 bg-gradient-to-br from-blue-50 to-purple-50 ring-2 ring-blue-400 ring-offset-1' 
-                          : 'border-gray-200 hover:border-blue-300 bg-gray-50'
-                      }`}
-                    >
-                      <img src={url} alt={`Avatar option ${index + 1}`} className='w-16 h-16 rounded-xl' />
-                      {avatar === url && (
-                        <div className='absolute top-0 right-0 bg-blue-600 rounded-full w-6 h-6 flex items-center justify-center'>
-                          <span className='text-white text-sm'>✓</span>
-                        </div>
-                      )}
-                    </button>
-                  ))}
-                </div>
-                <div className="flex justify-center pt-4 border-t border-gray-200">
-                  <div className="text-center">
-                    <p className='text-xs text-gray-500 mb-3'>Your selected avatar</p>
-                    <img src={avatar} alt="selected avatar" className='w-24 h-24 rounded-2xl border-3 border-blue-600 shadow-lg mx-auto' />
-                  </div>
+                <label className='block text-xs font-bold text-gray-800 mb-2'>📸 Profile Image</label>
+                <div className='flex flex-col items-center'>
+                  {/* File Upload Input */}
+                  <label className='w-full'>
+                    <div className='border-2 border-dashed border-blue-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition bg-gray-50'>
+                      <div className='text-2xl mb-1'>📷</div>
+                      <p className='text-gray-700 font-semibold text-xs mb-0.5'>Click to upload</p>
+                      <p className='text-gray-500 text-xs'>PNG/JPG up to 2MB</p>
+                    </div>
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleImageChange}
+                      className='hidden'
+                      required
+                    />
+                  </label>
+
+                  {/* Image Preview */}
+                  {avatarPreview && (
+                    <div className='mt-3 text-center pt-3 border-t border-gray-200 w-full'>
+                      <img 
+                        src={avatarPreview} 
+                        alt="profile preview" 
+                        className='w-20 h-20 rounded-lg border-2 border-blue-600 shadow-lg mx-auto object-cover' 
+                      />
+                      <button
+                        type='button'
+                        onClick={() => {
+                          setAvatar(null)
+                          setAvatarPreview(null)
+                        }}
+                        className='mt-2 text-xs text-red-600 hover:text-red-700 font-semibold transition'
+                      >
+                        Change
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Error Message */}
               {error && (
-                <div className='bg-red-50 border-2 border-red-300 rounded-xl p-4'>
-                  <p className='text-red-700 text-sm font-semibold flex items-center'>
-                    <span className='text-lg mr-2'>⚠️</span> {error}
+                <div className='bg-red-50 border-2 border-red-300 rounded-lg p-2'>
+                  <p className='text-red-700 text-xs font-semibold flex items-center'>
+                    <span className='text-sm mr-1'>⚠️</span> {error}
                   </p>
                 </div>
               )}
@@ -139,24 +167,24 @@ const Register = () => {
               <button 
                 type='submit' 
                 disabled={loading} 
-                className='w-full py-4 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold text-lg hover:from-blue-700 hover:to-purple-700 transition transform hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 mt-8'
+                className='w-full py-2 px-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-bold text-sm hover:from-blue-700 hover:to-purple-700 transition transform hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 mt-4'
               >
                 {loading ? (
                   <span className='flex items-center justify-center'>
-                    <span className='animate-spin mr-2'>⏳</span> Creating account...
+                    <span className='animate-spin mr-1 text-xs'>⏳</span> Creating...
                   </span>
                 ) : (
-                  <span>Create Account</span>
+                  <span>Sign Up</span>
                 )}
               </button>
             </form>
 
             {/* Login Link */}
-            <div className='text-center mt-8 pt-6 border-t border-gray-200'>
-              <p className='text-gray-700 text-sm'>
-                Already have an account?{' '}
-                <Link to="/login" className='text-blue-600 font-bold hover:text-blue-700 transition underline underline-offset-2'>
-                  Sign in here
+            <div className='text-center mt-4 pt-4 border-t border-gray-200'>
+              <p className='text-gray-700 text-xs'>
+                Have an account?{' '}
+                <Link to="/login" className='text-blue-600 font-bold hover:text-blue-700 transition underline underline-offset-1'>
+                  Sign in
                 </Link>
               </p>
             </div>
@@ -164,8 +192,8 @@ const Register = () => {
         </div>
 
         {/* Footer */}
-        <p className='text-center text-blue-100 text-xs mt-6'>
-          By signing up, you agree to our Terms of Service
+        <p className='text-center text-blue-100 text-xs mt-4'>
+          Secure & Fast
         </p>
       </div>
     </div>
